@@ -1,0 +1,26 @@
+# Changelog
+
+All notable changes to watch-vault are documented here.
+Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
+
+## [Unreleased]
+- _Add new entries here as you develop; move them under a version on release._
+
+## [0.1.0] — 2026-07-06
+### Added
+- **One-command pipeline** (`watch-vault <url>`): watch → auto-categorize → ingest → review HTML → open.
+- **Sub-agent + tiered-model routing** (Balanced posture): Sonnet analyst for frame vision/synthesis
+  (frames isolated from the main context), Haiku for category, Opus only on low-confidence/long+dense.
+- **Resource finder**: web-searches how to install/use any software a video mentions.
+- **Reality-check**: scores video claims 1–10 (1 = true, 10 = hype) against web sources, with
+  colour-coded badges in the review HTML and an overall `hype_score` in the note.
+- **Deterministic scripts** (stdlib-only): `report_to_html.py`, `compact_transcript.py`, `check_updates.py`.
+- **YouTube bot-gate bypass**: `WATCH_COOKIES_FROM_BROWSER` passthrough, applied to the upstream
+  `watch` engine non-destructively at install.
+- **Installer** with system-dep checks, upstream `watch` engine fetch, vault detection/creation,
+  ingest-op `CLAUDE.md` template, and interactive config.
+- **Update channel**: `update.sh` + `check_updates.py` (GitHub tags).
+- Cross-platform review opener (macOS/Linux/WSL).
+
+[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/manateeit/watch-vault/releases/tag/v0.1.0

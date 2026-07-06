@@ -1,0 +1,34 @@
+# watch-vault configuration — copied to ~/.config/watch-vault/config.toml by the installer.
+# Every value here can be overridden by an environment variable of the same UPPERCASE name
+# prefixed with WATCH_VAULT_ (e.g. WATCH_VAULT_VAULT_DIR).
+
+# --- Where your notes live -----------------------------------------------------------------
+# Absolute path to your Obsidian vault. Leave blank to auto-detect
+# (~/Second brain -> ~/Documents/Obsidian -> ~/Obsidian). The installer can create one for you.
+vault_dir = ""
+
+# --- How to open the generated review page -------------------------------------------------
+# macOS: "open"   Linux: "xdg-open"   WSL/Windows: "explorer.exe"
+open_command = "open"
+auto_open_review = true            # open review.html automatically after each run
+
+# --- YouTube access ------------------------------------------------------------------------
+# If yt-dlp hits "Sign in to confirm you're not a bot", set this to the browser that is
+# logged into YouTube. One of: "" (off) | safari | chrome | firefox | edge | brave
+cookies_from_browser = ""
+
+# --- Transcription -------------------------------------------------------------------------
+# Native captions are used first (free). Whisper is a fallback for caption-less videos.
+# "auto" uses whichever key is present in ~/.config/watch/.env; "none" disables Whisper.
+whisper_backend = "auto"           # auto | groq | openai | none
+
+# --- Cost / quality routing (see README > Routing) -----------------------------------------
+routing_posture = "balanced"       # balanced | aggressive | quality
+max_frames = 15                    # hard cap on frames the analyst sub-agent reads
+reality_check = true               # run the 1-10 hype reality-check stage
+resource_finder = true             # research how to get software/links a video mentions
+
+# --- Update channel (set by the installer; used by `watch-vault update`) --------------------
+repo = "manateeit/watch-vault"
+source_dir = ""                    # where the installer cloned the repo
+version = ""                       # installed version

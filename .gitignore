@@ -1,0 +1,11 @@
+# local state / secrets — never commit
+*.bak
+*.bak.*
+.DS_Store
+__pycache__/
+*.pyc
+.env
+config.toml
+# vault contents (users bring their own)
+raw/
+watched/
