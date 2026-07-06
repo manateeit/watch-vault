@@ -9,7 +9,9 @@ description: >
   token-heavy vision/synthesis and web research in Sonnet sub-agents so frames and
   fetched pages never bloat the main context. Use when the user gives a video URL and
   wants it watched AND filed into their vault — "watch and ingest this",
-  "watch-vault <url>", "add this video to my vault", or just pastes a URL.
+  "watch-vault <url>", "add this video to my vault", or just pastes a URL. Also handles
+  maintenance subcommands: "watch-vault update", "watch-vault check for updates",
+  "watch-vault version".
 ---
 
 # watch-vault
@@ -25,6 +27,19 @@ reserved for genuinely hard cases only.
 - setup:      `~/.claude/skills/watch/scripts/setup.py`
 - transcript: `~/.claude/skills/watch-vault/scripts/compact_transcript.py`
 - html gen:   `~/.claude/skills/watch-vault/scripts/report_to_html.py`
+
+## Subcommands (handle these BEFORE the pipeline)
+If the user's message is a maintenance command rather than a URL, do that instead of watching:
+
+- **`watch-vault update`** / "update watch-vault" / "update my copy" →
+  run `python3 ~/.claude/skills/watch-vault/scripts/self_update.py`, relay the result, and
+  remind them to **restart Claude Code** so the new `SKILL.md` loads. (Self-contained — it
+  re-clones if the original checkout is gone.)
+- **`watch-vault check-updates`** / "is there a watch-vault update?" →
+  run `python3 ~/.claude/skills/watch-vault/scripts/check_updates.py` and relay its one-liner.
+- **`watch-vault version`** → print the `version` from `~/.config/watch-vault/config.toml`.
+
+Anything that contains a video URL falls through to the pipeline below.
 
 ## Model & sub-agent routing (cost discipline — follow this)
 
