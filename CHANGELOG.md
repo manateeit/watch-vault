@@ -1,19 +1,24 @@
 # Changelog
 
-## v0.3.0 (2026-01-06)
-
-### Added
-- **Workflow automation:** `watch-vault-full.workflow.js` orchestrates batch video ingestion with parallel phases (download → analyze → research → ingest → HTML). Run multiple videos in one command via `/workflows watch-vault-full [url1, url2, ...]` and monitor progress in the workflows dashboard.
-- Workflow shows parallelization potential: all downloads run in parallel, all analysts run in parallel, all researchers run in parallel, then ingest and HTML generation.
+## v0.3.1 (2026-01-06)
 
 ### Changed
-- Updated SKILL.md to document Workflow mode alongside procedural spec.
+- **Workflow is now the primary batch mode.** Saved at `~/.claude/workflows/watch-vault.js` following Claude Code Workflows specification.
+- Users invoke batch with `/watch-vault ["url1", "url2", ...]` (Workflow, not procedural steps)
+- Single URLs still work via `watch-vault <url>` (procedural SKILL.md pipeline)
+- Workflow phases: Download → Analyze → Research → Ingest → Publish (all parallelizable stages run concurrently)
+- Real-time progress tracking via `/workflows` dashboard: monitor agent counts, token usage, drill into phases
+- Updated SKILL.md to document Workflow vs. single-URL modes
 
 ### Technical
-- Workflow uses Sonnet sub-agents for analyst & researcher phases (cost discipline).
-- Batch mode automatically routes videos to vault categories based on suggested category from analyst.
-- All 4 analysis videos ingested successfully: Portfolio automation (Stock Trading/), Polymarket bot, STORM research, Hermes agent (all AI/).
+- Workflow uses proper Claude Code Workflow syntax: `export const meta`, `phase()`, `agent()`, `parallel()`
+- No file I/O in script itself; all read/write delegated to spawned agents
+- Proper error handling and fallback for failed individual videos (rest of batch continues)
 
-## v0.2.4 (2026-01-05)
+## v0.3.0 (2026-01-06)
+
+- Initial Workflow automation attempt (framework only, not properly integrated)
+
+## v0.2.4 (earlier)
 
 [Previous release notes...]
