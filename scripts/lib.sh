@@ -46,11 +46,54 @@ detect_open_cmd() {
   esac
 }
 
-# Install a system package via the platform's package manager.
+# Put ~/.local/bin on PATH (for this run + future shells) — used by the no-brew macOS path.
+ensure_local_bin_on_path() {
+  mkdir -p "$HOME/.local/bin"
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *)
+      export PATH="$HOME/.local/bin:$PATH"
+      local prof="$HOME/.zprofile"
+      grep -qs 'HOME/.local/bin' "$prof" 2>/dev/null || \
+        printf '\n# added by watch-vault installer\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$prof" ;;
+  esac
+}
+
+# Download a single static binary into ~/.local/bin (no sudo, no brew), then VERIFY it runs.
+fetch_static_bin() {
+  local name="$1" dst="$HOME/.local/bin/$1" tmp rc
+  tmp="$(mktemp -d)"
+  case "$name" in
+    yt-dlp)
+      curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos" -o "$dst" && chmod +x "$dst" ;;
+    ffmpeg|ffprobe)
+      curl -fsSL "https://evermeet.cx/ffmpeg/getrelease/$name/zip" -o "$tmp/$name.zip" \
+        && unzip -oq "$tmp/$name.zip" -d "$HOME/.local/bin" && chmod +x "$dst" ;;
+  esac
+  rc=$?; rm -rf "$tmp"
+  [ $rc -eq 0 ] && [ -x "$dst" ] || { warn "Could not download $name."; return 1; }
+  if ! "$dst" -version >/dev/null 2>&1; then
+    warn "$name downloaded but won't run here (Apple Silicon likely needs Rosetta 2)."
+    warn "Fix with:  softwareupdate --install-rosetta --agree-to-license   — or install Homebrew (https://brew.sh)."
+    return 1
+  fi
+  ok "$name ready (~/.local/bin/$name)"
+}
+
+# Install a system package via the platform's package manager (or no-sudo binaries on brew-less macOS).
 pkg_install() {
   local pkg="$1"
   case "$(detect_os)" in
-    macos) have brew && brew install "$pkg" || die "Homebrew not found — install from https://brew.sh then re-run." ;;
+    macos)
+      if have brew; then brew install "$pkg"
+      else
+        warn "Homebrew not found — installing $pkg as a no-sudo static binary into ~/.local/bin."
+        ensure_local_bin_on_path
+        case "$pkg" in
+          ffmpeg) fetch_static_bin ffmpeg && fetch_static_bin ffprobe ;;
+          *)      fetch_static_bin "$pkg" ;;
+        esac || die "Could not install $pkg without Homebrew. Install brew (https://brew.sh) or the binary manually, then re-run."
+      fi ;;
     linux|wsl)
       if   have apt-get; then sudo apt-get update -y && sudo apt-get install -y "$pkg"
       elif have dnf;     then sudo dnf install -y "$pkg"
