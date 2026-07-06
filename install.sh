@@ -41,13 +41,15 @@ else
   say "Installing the watch engine from $WATCH_UPSTREAM …"
   tmp="$(mktemp -d)"
   if git clone --depth 1 "$WATCH_UPSTREAM" "$tmp/claude-watch" >/dev/null 2>&1; then
-    # locate the skill dir inside the upstream repo (it ships as a plugin/skill)
-    engine="$(find "$tmp/claude-watch" -type d -name scripts -path '*watch*' | head -1)"
-    engine="${engine%/scripts}"
-    [ -n "$engine" ] || engine="$tmp/claude-watch"
+    # The skill root is whatever dir contains scripts/watch.py (repo may have other
+    # 'scripts' dirs, e.g. hooks/scripts — don't match those).
+    wpy="$(find "$tmp/claude-watch" -type f -path '*/scripts/watch.py' | head -1)"
+    engine="$tmp/claude-watch"
+    [ -n "$wpy" ] && engine="$(dirname "$(dirname "$wpy")")"
     mkdir -p "$SKILLS_DIR/watch"
     cp -R "$engine/." "$SKILLS_DIR/watch/"
-    ok "watch engine installed"
+    if [ -f "$SKILLS_DIR/watch/scripts/watch.py" ]; then ok "watch engine installed"
+    else warn "watch engine copied but scripts/watch.py not found — upstream layout may have changed."; fi
   else
     warn "Could not clone the watch engine automatically."
     warn "Install it manually from $WATCH_UPSTREAM into $SKILLS_DIR/watch, then re-run."
