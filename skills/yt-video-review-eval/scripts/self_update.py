@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Self-contained updater for watch-vault. Pulls the latest and reinstalls the skill
+Self-contained updater for yt-video-review-eval. Pulls the latest and reinstalls the skill
 in place — works even if the original `git clone` is gone (re-clones to a cache dir).
-Invoked by the `watch-vault update` subcommand. Stdlib only (shells out to git).
+Invoked by the `yt-video-review-eval update` subcommand. Stdlib only (shells out to git).
 
     python self_update.py           # update to latest main
     python self_update.py --dry-run # show what it would do
@@ -10,11 +10,11 @@ Invoked by the `watch-vault update` subcommand. Stdlib only (shells out to git).
 import argparse, re, shutil, subprocess, sys
 from pathlib import Path
 
-CFG = Path.home() / ".config" / "watch-vault" / "config.toml"
-SKILL_DIR = Path.home() / ".claude" / "skills" / "watch-vault"
+CFG = Path.home() / ".config" / "yt-video-review-eval" / "config.toml"
+SKILL_DIR = Path.home() / ".claude" / "skills" / "yt-video-review-eval"
 WATCH_DL = Path.home() / ".claude" / "skills" / "watch" / "scripts" / "download.py"
-CACHE = Path.home() / ".local" / "share" / "watch-vault" / "src"
-DEFAULT_REPO = "manateeit/watch-vault"
+CACHE = Path.home() / ".local" / "share" / "yt-video-review-eval" / "src"
+DEFAULT_REPO = "manateeit/yt-video-review-eval"
 
 
 def read_cfg():
@@ -81,7 +81,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     if shutil.which("git") is None:
-        sys.exit("git is required to update watch-vault.")
+        sys.exit("git is required to update yt-video-review-eval.")
 
     cfg = read_cfg()
     old = cfg.get("version", "?")
@@ -92,7 +92,7 @@ def main():
         print(f"dry-run: {old} -> {new} (would reinstall skill from {src})")
         return
 
-    copytree(src / "skills" / "watch-vault", SKILL_DIR)
+    copytree(src / "skills" / "yt-video-review-eval", SKILL_DIR)
     patcher = src / "scripts" / "ensure_cookie_support.py"
     if WATCH_DL.exists() and patcher.exists():
         subprocess.run([sys.executable, str(patcher), str(WATCH_DL)], check=False)
@@ -102,9 +102,9 @@ def main():
                    check=False, stdout=subprocess.DEVNULL)
 
     if old == new:
-        print(f"✓ watch-vault reinstalled; already at latest ({new}).")
+        print(f"✓ yt-video-review-eval reinstalled; already at latest ({new}).")
     else:
-        print(f"✓ watch-vault updated {old} -> {new}. Restart Claude Code to pick up SKILL.md changes.")
+        print(f"✓ yt-video-review-eval updated {old} -> {new}. Restart Claude Code to pick up SKILL.md changes.")
 
 
 if __name__ == "__main__":

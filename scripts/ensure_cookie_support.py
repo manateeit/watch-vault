@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Non-destructively add YouTube-cookie passthrough to the upstream `watch` engine's
-download.py, so watch-vault can clear the "confirm you're not a bot" gate via
+download.py, so yt-video-review-eval can clear the "confirm you're not a bot" gate via
 WATCH_COOKIES_FROM_BROWSER / WATCH_COOKIES_FILE. Idempotent — safe to re-run.
 
     python ensure_cookie_support.py ~/.claude/skills/watch/scripts/download.py
@@ -16,7 +16,7 @@ IMPORT_ADD = "import os\nimport shutil"
 
 CMD_ANCHOR = '    cmd = [\n        "yt-dlp",\n'
 CMD_ADD = (
-    '    # [watch-vault] cookies passthrough for bot-gated networks. Set\n'
+    '    # [yt-video-review-eval] cookies passthrough for bot-gated networks. Set\n'
     '    # WATCH_COOKIES_FROM_BROWSER=safari|chrome|firefox or WATCH_COOKIES_FILE=cookies.txt\n'
     '    _cb = os.environ.get("WATCH_COOKIES_FROM_BROWSER", "").strip()\n'
     '    _cf = os.environ.get("WATCH_COOKIES_FILE", "").strip()\n'

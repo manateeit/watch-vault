@@ -4,7 +4,7 @@ Direction, not promises. Vote/comment via issues.
 
 ## Now (0.1.x)
 - Harden the upstream `watch` engine fetch across repo layouts.
-- `watch-vault doctor` command: verify deps, config, vault, and the engine in one shot.
+- `yt-video-review-eval doctor` command: verify deps, config, vault, and the engine in one shot.
 - Config-selectable routing posture actually wired into the SKILL steps (not just documented).
 
 ## Next (0.2)

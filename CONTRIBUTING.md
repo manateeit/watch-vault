@@ -1,4 +1,4 @@
-# Contributing to watch-vault
+# Contributing to yt-video-review-eval
 
 Thanks for helping improve it. This is a small, script-first project — contributions stay
 easy to review.
@@ -18,7 +18,7 @@ easy to review.
   and tag `vX.Y.Z` on release (that tag is what `check_updates.py` compares against).
 - **Scripts:** Python scripts are **stdlib-only** (no pip deps) and ship a `--demo`/`--help`
   self-check. Bash is `set -euo pipefail` and sources `scripts/lib.sh`.
-- **The skill contract:** `skills/watch-vault/SKILL.md` is the workflow's source of truth —
+- **The skill contract:** `skills/yt-video-review-eval/SKILL.md` is the workflow's source of truth —
   update it when behavior changes, and keep paths generic (`~/.claude/skills/…`, config-driven
   vault) so it works for every user.
 

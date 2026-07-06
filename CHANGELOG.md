@@ -3,9 +3,9 @@
 ## v0.3.1 (2026-01-06)
 
 ### Changed
-- **Workflow is now the primary batch mode.** Saved at `~/.claude/workflows/watch-vault.js` following Claude Code Workflows specification.
-- Users invoke batch with `/watch-vault ["url1", "url2", ...]` (Workflow, not procedural steps)
-- Single URLs still work via `watch-vault <url>` (procedural SKILL.md pipeline)
+- **Workflow is now the primary batch mode.** Saved at `~/.claude/workflows/yt-video-review-eval.js` following Claude Code Workflows specification.
+- Users invoke batch with `/yt-video-review-eval ["url1", "url2", ...]` (Workflow, not procedural steps)
+- Single URLs still work via `yt-video-review-eval <url>` (procedural SKILL.md pipeline)
 - Workflow phases: Download → Analyze → Research → Ingest → Publish (all parallelizable stages run concurrently)
 - Real-time progress tracking via `/workflows` dashboard: monitor agent counts, token usage, drill into phases
 - Updated SKILL.md to document Workflow vs. single-URL modes

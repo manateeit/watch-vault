@@ -1,5 +1,5 @@
 ---
-name: watch-vault
+name: yt-video-review-eval
 description: >
   One-shot pipeline: given a YouTube (or any yt-dlp / local) video URL, watch it,
   auto-pick the best Obsidian-vault category, research how to get any software/links
@@ -9,12 +9,12 @@ description: >
   token-heavy vision/synthesis and web research in Sonnet sub-agents so frames and
   fetched pages never bloat the main context. Use when the user gives a video URL and
   wants it watched AND filed into their vault — "watch and ingest this",
-  "watch-vault <url>", "add this video to my vault", or just pastes a URL. Also handles
-  maintenance subcommands: "watch-vault update", "watch-vault check for updates",
-  "watch-vault version".
+  "yt-video-review-eval <url>", "add this video to my vault", or just pastes a URL. Also handles
+  maintenance subcommands: "yt-video-review-eval update", "yt-video-review-eval check for updates",
+  "yt-video-review-eval version".
 ---
 
-# watch-vault
+# yt-video-review-eval
 
 Chains **/watch → vault ingest → review HTML** into a single run from just a URL.
 Designed for **token discipline**: mechanical steps are scripts (zero LLM), the
@@ -25,19 +25,19 @@ reserved for genuinely hard cases only.
 **Absolute paths (this machine):**
 - watch:      `~/.claude/skills/watch/scripts/watch.py`
 - setup:      `~/.claude/skills/watch/scripts/setup.py`
-- transcript: `~/.claude/skills/watch-vault/scripts/compact_transcript.py`
-- html gen:   `~/.claude/skills/watch-vault/scripts/report_to_html.py`
+- transcript: `~/.claude/skills/yt-video-review-eval/scripts/compact_transcript.py`
+- html gen:   `~/.claude/skills/yt-video-review-eval/scripts/report_to_html.py`
 
 ## Subcommands (handle these BEFORE the pipeline)
 If the user's message is a maintenance command rather than a URL, do that instead of watching:
 
-- **`watch-vault update`** / "update watch-vault" / "update my copy" →
-  run `python3 ~/.claude/skills/watch-vault/scripts/self_update.py`, relay the result, and
+- **`yt-video-review-eval update`** / "update yt-video-review-eval" / "update my copy" →
+  run `python3 ~/.claude/skills/yt-video-review-eval/scripts/self_update.py`, relay the result, and
   remind them to **restart Claude Code** so the new `SKILL.md` loads. (Self-contained — it
   re-clones if the original checkout is gone.)
-- **`watch-vault check-updates`** / "is there a watch-vault update?" →
-  run `python3 ~/.claude/skills/watch-vault/scripts/check_updates.py` and relay its one-liner.
-- **`watch-vault version`** → print the `version` from `~/.config/watch-vault/config.toml`.
+- **`yt-video-review-eval check-updates`** / "is there a yt-video-review-eval update?" →
+  run `python3 ~/.claude/skills/yt-video-review-eval/scripts/check_updates.py` and relay its one-liner.
+- **`yt-video-review-eval version`** → print the `version` from `~/.config/yt-video-review-eval/config.toml`.
 
 Anything that contains a video URL falls through to the pipeline below.
 
@@ -45,9 +45,9 @@ Anything that contains a video URL falls through to the pipeline below.
 
 For ingesting **multiple videos in one run**, use the **Workflow version:**
 ```
-/workflows watch-vault-full [url1, url2, url3, ...]
+/workflows yt-video-review-eval-full [url1, url2, url3, ...]
 ```
-Orchestrates download → analyze → research → ingest → HTML in parallel phases. Same pipeline, fully orchestrated so all videos run in parallel where possible. Shows in `/workflows` dashboard while running. Pass URLs as an array in the skill args (or one at a time for single URL via the standard `watch-vault <url>` skill).
+Orchestrates download → analyze → research → ingest → HTML in parallel phases. Same pipeline, fully orchestrated so all videos run in parallel where possible. Shows in `/workflows` dashboard while running. Pass URLs as an array in the skill args (or one at a time for single URL via the standard `yt-video-review-eval <url>` skill).
 
 ## Model & sub-agent routing (cost discipline — follow this)
 
@@ -67,7 +67,7 @@ only** when the analyst returns `confidence=low` OR the video is `>30 min AND de
 Never read frames in the main thread; never use Opus for a step Sonnet or a script can do.
 
 ## Step 0 — Load config
-Read `~/.config/watch-vault/config.toml` (created by the installer). Honor:
+Read `~/.config/yt-video-review-eval/config.toml` (created by the installer). Honor:
 `vault_dir`, `open_command` (macOS `open` · Linux `xdg-open` · WSL `explorer.exe`),
 `cookies_from_browser`, `whisper_backend`, `routing_posture`, `max_frames`,
 `reality_check`, `resource_finder`, `auto_open_review`. Env vars override the file.
@@ -134,7 +134,7 @@ Keep it evidence-first and fair: reward true claims with low scores, don't punis
 video for a clickbait title beyond the title's own bullet.
 
 ## Step 4 — Confirm the category (cheap)
-Resolve `$VAULT_DIR` — prefer `vault_dir` from `~/.config/watch-vault/config.toml`, else
+Resolve `$VAULT_DIR` — prefer `vault_dir` from `~/.config/yt-video-review-eval/config.toml`, else
 `$WATCH_VAULT_DIR`, else `~/Second brain` → `~/Documents/Obsidian` → `~/Obsidian`. Read
 `$VAULT_DIR/CLAUDE.md`, sanity-check the analyst's suggested category against its
 routing rules, **state the choice in chat** ("Filing under X because …", overridable),

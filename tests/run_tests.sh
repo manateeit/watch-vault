@@ -2,12 +2,12 @@
 # Fast, dependency-free smoke tests: the stdlib script self-checks + a syntax pass.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-S="$ROOT/skills/watch-vault/scripts"
+S="$ROOT/skills/yt-video-review-eval/scripts"
 fail=0
 
 check() { printf '  %-38s' "$1"; shift; if "$@" >/dev/null 2>&1; then echo "ok"; else echo "FAIL"; fail=1; fi; }
 
-echo "watch-vault tests"
+echo "yt-video-review-eval tests"
 check "report_to_html --demo"      python3 "$S/report_to_html.py" --demo
 check "compact_transcript importable" python3 -c "import ast,sys; ast.parse(open('$S/compact_transcript.py').read())"
 check "check_updates importable"   python3 -c "import ast,sys; ast.parse(open('$S/check_updates.py').read())"

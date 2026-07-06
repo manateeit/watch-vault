@@ -1,4 +1,4 @@
-# watch-vault configuration — copied to ~/.config/watch-vault/config.toml by the installer.
+# yt-video-review-eval configuration — copied to ~/.config/yt-video-review-eval/config.toml by the installer.
 # Every value here can be overridden by an environment variable of the same UPPERCASE name
 # prefixed with WATCH_VAULT_ (e.g. WATCH_VAULT_VAULT_DIR).
 
@@ -28,7 +28,7 @@ max_frames = 15                    # hard cap on frames the analyst sub-agent re
 reality_check = true               # run the 1-10 hype reality-check stage
 resource_finder = true             # research how to get software/links a video mentions
 
-# --- Update channel (set by the installer; used by `watch-vault update`) --------------------
-repo = "manateeit/watch-vault"
+# --- Update channel (set by the installer; used by `yt-video-review-eval update`) --------------------
+repo = "manateeit/yt-video-review-eval"
 source_dir = ""                    # where the installer cloned the repo
 version = ""                       # installed version

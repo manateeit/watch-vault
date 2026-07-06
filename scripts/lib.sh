@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helpers for watch-vault install/update scripts. Source this file.
+# Shared helpers for yt-video-review-eval install/update scripts. Source this file.
 set -euo pipefail
 
 if [ -t 1 ]; then
@@ -55,7 +55,7 @@ ensure_local_bin_on_path() {
       export PATH="$HOME/.local/bin:$PATH"
       local prof="$HOME/.zprofile"
       grep -qs 'HOME/.local/bin' "$prof" 2>/dev/null || \
-        printf '\n# added by watch-vault installer\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$prof" ;;
+        printf '\n# added by yt-video-review-eval installer\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$prof" ;;
   esac
 }
 

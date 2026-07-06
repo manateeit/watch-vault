@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# watch-vault installer.
-#   git clone https://github.com/manateeit/watch-vault && cd watch-vault && ./install.sh
-# Re-running is safe (idempotent). Installs the watch-vault skill, the upstream `watch`
+# yt-video-review-eval installer.
+#   git clone https://github.com/manateeit/yt-video-review-eval && cd yt-video-review-eval && ./install.sh
+# Re-running is safe (idempotent). Installs the yt-video-review-eval skill, the upstream `watch`
 # engine (MIT, taoufik123-collab/claude-watch) + our cookie patch, checks system deps,
 # sets up (or creates) an Obsidian vault, and writes your config.
 set -euo pipefail
@@ -12,11 +12,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 WATCH_UPSTREAM="https://github.com/taoufik123-collab/claude-watch"
 SKILLS_DIR="$HOME/.claude/skills"
-CFG_DIR="$HOME/.config/watch-vault"
+CFG_DIR="$HOME/.config/yt-video-review-eval"
 OS="$(detect_os)"
 VERSION="$(cat "$ROOT/VERSION" 2>/dev/null || echo 0.0.0)"
 
-printf '\n%s\n' "${BOLD}watch-vault installer${RESET} ${DIM}v$VERSION · $OS${RESET}"
+printf '\n%s\n' "${BOLD}yt-video-review-eval installer${RESET} ${DIM}v$VERSION · $OS${RESET}"
 printf '%s\n\n' "${DIM}Turn any video URL into a filed, fact-checked note in your Obsidian vault.${RESET}"
 
 # ── 1. Host + system dependencies ─────────────────────────────────────────────────────────
@@ -63,11 +63,11 @@ fi
 # validate the engine deps if its setup exists
 [ -f "$SKILLS_DIR/watch/scripts/setup.py" ] && python3 "$SKILLS_DIR/watch/scripts/setup.py" --check >/dev/null 2>&1 && ok "watch engine deps OK" || true
 
-# ── 3. The watch-vault skill ──────────────────────────────────────────────────────────────
-say "Installing the watch-vault skill…"
-mkdir -p "$SKILLS_DIR/watch-vault"
-cp -R "$ROOT/skills/watch-vault/." "$SKILLS_DIR/watch-vault/"
-ok "watch-vault skill installed → $SKILLS_DIR/watch-vault"
+# ── 3. The yt-video-review-eval skill ──────────────────────────────────────────────────────────────
+say "Installing the yt-video-review-eval skill…"
+mkdir -p "$SKILLS_DIR/yt-video-review-eval"
+cp -R "$ROOT/skills/yt-video-review-eval/." "$SKILLS_DIR/yt-video-review-eval/"
+ok "yt-video-review-eval skill installed → $SKILLS_DIR/yt-video-review-eval"
 
 # ── 4. Vault ──────────────────────────────────────────────────────────────────────────────
 say "Locating your Obsidian vault…"
@@ -90,7 +90,7 @@ else
 fi
 # drop the ingest-op CLAUDE.md if the vault has none
 if [ -n "$vault" ] && [ ! -f "$vault/CLAUDE.md" ]; then
-  if ask_yes_no "Add the watch-vault ingest rules (CLAUDE.md) to this vault?" y; then
+  if ask_yes_no "Add the yt-video-review-eval ingest rules (CLAUDE.md) to this vault?" y; then
     cp "$ROOT/templates/vault-CLAUDE.md" "$vault/CLAUDE.md"
     mkdir -p "$vault/raw/watched"
     ok "Added $vault/CLAUDE.md (edit the Categories to taste)"
@@ -127,15 +127,15 @@ ok "Wrote $cfg"
 
 # ── 7. Self-check + done ──────────────────────────────────────────────────────────────────
 say "Verifying…"
-python3 "$SKILLS_DIR/watch-vault/scripts/report_to_html.py" --demo >/dev/null && ok "report_to_html self-check passed"
-printf '\n%s\n' "${GREEN}${BOLD}watch-vault installed.${RESET}"
+python3 "$SKILLS_DIR/yt-video-review-eval/scripts/report_to_html.py" --demo >/dev/null && ok "report_to_html self-check passed"
+printf '\n%s\n' "${GREEN}${BOLD}yt-video-review-eval installed.${RESET}"
 cat <<EOF
 
   Next steps:
     1. Open Claude Code.
-    2. Paste a YouTube URL and say:  ${BOLD}watch-vault <url>${RESET}
+    2. Paste a YouTube URL and say:  ${BOLD}yt-video-review-eval <url>${RESET}
     3. Review the note + review.html it files into your vault.
 
   Config:   $cfg   (edit categories in ${vault:-<your vault>}/CLAUDE.md)
-  Update:   ${BOLD}./update.sh${RESET}   ·   Check:  python3 $SKILLS_DIR/watch-vault/scripts/check_updates.py
+  Update:   ${BOLD}./update.sh${RESET}   ·   Check:  python3 $SKILLS_DIR/yt-video-review-eval/scripts/check_updates.py
 EOF

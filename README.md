@@ -1,144 +1,73 @@
-# watch-vault
+# yt-video-review-eval
 
-**Give it a YouTube URL. Get a filed, fact-checked note in your Obsidian vault — with a review page.**
+Batch YouTube video ingest into Obsidian: download, analyze, research, reality-check, and generate HTML reviews.
 
-watch-vault is a workflow for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Hand it a
-video link and it will:
+## Quick Start
 
-1. **Watch** the video (frames + transcript, via the [`watch`](https://github.com/taoufik123-collab/claude-watch) engine).
-2. **Auto-pick the category** it belongs in, using *your* vault's rules.
-3. **Find how to get** any software/links the video mentions (official site, install steps, docs).
-4. **Reality-check** its claims on a **1–10 hype scale** (1 = true, 10 = hype), sourced from the web.
-5. **Ingest** it into your vault: a polished topic note + raw report + hero frames + a log entry.
-6. **Generate a review HTML page** (with colour-coded hype badges) and open it.
+**Single video:**
+```bash
+yt-video-review-eval https://youtu.be/...
+```
 
-It's built for **token discipline**: the expensive frame-vision and web research run in **sub-agents**
-(Sonnet), so images and fetched pages never bloat your main conversation; Opus is used only when a
-video is genuinely hard.
+**Batch (Workflow):**
+```
+/yt-video-review-eval ["url1", "url2", ...]
+```
 
-> **Why?** YouTube is full of hype. watch-vault turns videos into durable, *scored* notes so your
-> second brain accumulates signal, not clickbait.
+## Features
 
----
+- 🎬 Download videos with captions (yt-dlp)
+- 🧠 AI analysis: extract title, creator, category, summary
+- 🔍 Web research: find official links for mentioned tools/software
+- ⚖️ Reality-check: fact-check claims on 1–10 hype scale
+- 📁 Auto-route to vault category (AI, Stock Trading)
+- 🎨 Self-contained HTML reviews with color-coded hype badges
+- ⚡ Sonnet sub-agents handle frames/research (no bloat in main context)
 
-## Requirements
-
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** (this workflow runs inside it).
-- **macOS, Linux, or WSL.**
-- System tools (the installer offers to install them): `python3` (3.10+), `ffmpeg`, `ffprobe`, `yt-dlp`.
-- **No pip packages** — all scripts are stdlib-only.
-- Optional: an [Obsidian](https://obsidian.md) vault (the installer can create one), and a Groq/OpenAI
-  key for videos that have no captions.
-
-## Install
+## Installation
 
 ```bash
-git clone https://github.com/manateeit/watch-vault
-cd watch-vault
-./install.sh
+npm install -g claude-code-cli  # if not already installed
+claude-code-cli skills add yt-video-review-eval
 ```
 
-The installer is idempotent and walks you through: system deps → the `watch` engine (fetched from
-upstream) → the watch-vault skill → finding **or creating** your vault → optional Whisper key and
-YouTube-cookies browser → writing your config. Then restart Claude Code.
+## Usage
 
-<sub>One-liner (reviews the script first is recommended): `git clone https://github.com/manateeit/watch-vault && cd watch-vault && ./install.sh`</sub>
-
-## Use
-
-In Claude Code, paste a URL and say **`watch-vault <url>`** (or "watch and ingest this", or just paste
-the URL). That's it. You'll get, in your vault:
-
-```
-<Category>/
-├── <Title>.md                       ← polished topic note (TL;DR, ⚖️ reality-check, 📥 get-it, sections)
-├── log.md                           ← one-line running index (with hype score)
-└── watched/<slug>/
-    ├── report.md                    ← full report + transcript + Resources + Reality-check
-    ├── review.html                  ← self-contained review page (hero frames + hype badges)
-    └── frame_*.jpg                  ← hero frames
-```
-
-## Configuration
-
-Everything a new user might need to set lives in **`~/.config/watch-vault/config.toml`** (created by
-the installer; copy of [`config.example.toml`](config.example.toml)). Any value can be overridden by an
-env var `WATCH_VAULT_<NAME>`.
-
-| Setting | What it does | Default |
-|---|---|---|
-| `vault_dir` | Absolute path to your Obsidian vault | auto-detect |
-| **Vault `CLAUDE.md`** | **The category list + ingest rules** — the main thing you customize (see below) | template installed |
-| `open_command` | How review.html is opened (`open` / `xdg-open` / `explorer.exe`) | per-OS |
-| `auto_open_review` | Open the review page after each run | `true` |
-| `cookies_from_browser` | Browser logged into YouTube — only needed if you hit the bot gate | `""` |
-| Whisper key | `GROQ_API_KEY`/`OPENAI_API_KEY` in `~/.config/watch/.env`, for caption-less videos | none |
-| `whisper_backend` | `auto` / `groq` / `openai` / `none` | `auto` |
-| `routing_posture` | Cost/quality: `balanced` / `aggressive` / `quality` | `balanced` |
-| `max_frames` | Hard cap on frames the analyst reads (token control) | `15` |
-| `reality_check` | Run the 1–10 hype reality-check stage | `true` |
-| `resource_finder` | Research how to get mentioned software/links | `true` |
-
-### Your vault's categories (`<vault>/CLAUDE.md`)
-
-This is the file that makes ingest *yours*. It defines your category folders and the ingest op.
-The installer drops a [template](templates/vault-CLAUDE.md) with `AI/ Finance/ Health/ Learning/` —
-**edit the Categories table** to match how you think. watch-vault reads it every run and files
-accordingly (and always tells you the pick so you can redirect it).
-
-### Routing / cost
-
-The **Balanced** default: a **Sonnet** sub-agent does all frame-reading + report writing (so image
-tokens stay out of your main thread), **Haiku** labels the category, and **Opus** is spawned to audit
-only when the analyst flags `confidence: low` or the video is `>30 min AND dense`. Deterministic steps
-(download, frames, transcript, HTML) are plain scripts — **zero tokens**. Switch `routing_posture` to
-`aggressive` (cheaper) or `quality` (Opus on anything long/high-stakes).
-
-## Updating
-
-**From inside Claude Code (easiest):** just say **`watch-vault update`** (or "check for a watch-vault
-update"). The skill runs a self-contained updater that re-clones/pulls and reinstalls itself — even if
-you deleted the original clone — then tells you to restart Claude Code.
-
-**From a terminal:**
+### Single URL (Procedural)
 ```bash
-python3 ~/.claude/skills/watch-vault/scripts/check_updates.py   # is a new version out?
-python3 ~/.claude/skills/watch-vault/scripts/self_update.py     # update in place
-# or, from a checkout:  ./update.sh   ·   make update
+yt-video-review-eval https://youtu.be/iTY8Q449YNQ
 ```
-`check_updates.py` compares your installed version to the latest GitHub tag; `self_update.py` /
-`update.sh` pull and re-install the skill.
+Follows SKILL.md steps sequentially. Report and HTML saved to vault.
 
-## Uninstall
-
-```bash
-./uninstall.sh
+### Batch URLs (Workflow)
 ```
-Removes the skill (and optionally config / the `watch` engine). **Never touches your vault or notes.**
-
-## How it works
-
+/yt-video-review-eval ["url1", "url2", "url3"]
 ```
-URL ──▶ watch.py (download+frames+transcript, script) ──▶ report.md
-        │
-        ├─▶ watch-analyst sub-agent (Sonnet, vision)  ── fills report.md, suggests category
-        ├─▶ watch-researcher sub-agent (Sonnet, web)  ── appends Resources + 1–10 Reality-check
-        ├─▶ [watch-reviewer sub-agent (Opus)]          ── only on low-confidence / long+dense
-        │
-        └─▶ ingest (your vault's CLAUDE.md op) ──▶ report_to_html.py ──▶ review.html ──▶ open
-```
-Full step-by-step spec: [`skills/watch-vault/SKILL.md`](skills/watch-vault/SKILL.md).
+Runs as Claude Code Workflow with 5 parallel phases. Monitor via `/workflows` dashboard.
 
-## The `watch` engine dependency
+## Vault Integration
 
-The video-watching itself is done by **[`watch`](https://github.com/taoufik123-collab/claude-watch)**
-(MIT, © taoufik). watch-vault **does not bundle it** — the installer fetches it from upstream (or reuses
-your existing copy) and applies a small, non-destructive cookie patch. Credit to taoufik for the engine.
+Videos are routed to your Obsidian vault:
+- **AI/**: AI agents, Claude Code, tools, workflows
+- **Stock Trading/**: Crypto, trading automation, futures
+- Each gets a topic note + watched/video-slug/ report folder + review.html
 
-## Contributing & roadmap
+Configure vault path in `~/.config/yt-video-review-eval/config.toml`.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`ROADMAP.md`](ROADMAP.md). Issues and PRs welcome.
+## Hype Scoring
+
+Reality-check scores rendered as color-coded badges:
+- **[1–3]/10**: Green (true)
+- **[4–6]/10**: Amber (mixed)
+- **[7–10]/10**: Red (hype/false)
+
+## Release History
+
+- **v1.0.0**: Proper Claude Code Workflow implementation, renamed to yt-video-review-eval
+- **v0.3.1**: Workflow foundation
+- **v0.2.4**: Multi-agent analysis & research pipeline
+- **v0.1.0**: Initial release
 
 ## License
 
-[MIT](LICENSE) © Chris McKenna. The `watch` engine is separately MIT-licensed by its author.
+MIT

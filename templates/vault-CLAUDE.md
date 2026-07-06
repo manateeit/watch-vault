@@ -1,6 +1,6 @@
-# Obsidian Vault — Ingest rules (watch-vault)
+# Obsidian Vault — Ingest rules (yt-video-review-eval)
 
-This file tells watch-vault (and any agent) how to file a finished `report.md` into this
+This file tells yt-video-review-eval (and any agent) how to file a finished `report.md` into this
 vault. **Customize the Categories below** to match how you think — the Ingest op stays the same.
 
 ## Categories

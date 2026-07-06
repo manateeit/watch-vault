@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Pull the latest watch-vault and re-install the skill in place (non-interactive).
+# Pull the latest yt-video-review-eval and re-install the skill in place (non-interactive).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$ROOT/scripts/lib.sh"
 
 SKILLS_DIR="$HOME/.claude/skills"
-CFG="$HOME/.config/watch-vault/config.toml"
+CFG="$HOME/.config/yt-video-review-eval/config.toml"
 
 # Prefer the source dir recorded at install time; fall back to this checkout.
 src="$ROOT"
@@ -20,9 +20,9 @@ if [ -d "$src/.git" ]; then
   [ "$before" = "$after" ] && ok "Already at latest ($after)" || ok "Updated $before → $after"
 fi
 
-say "Re-installing the watch-vault skill…"
-mkdir -p "$SKILLS_DIR/watch-vault"
-cp -R "$src/skills/watch-vault/." "$SKILLS_DIR/watch-vault/"
+say "Re-installing the yt-video-review-eval skill…"
+mkdir -p "$SKILLS_DIR/yt-video-review-eval"
+cp -R "$src/skills/yt-video-review-eval/." "$SKILLS_DIR/yt-video-review-eval/"
 [ -f "$SKILLS_DIR/watch/scripts/download.py" ] && \
   python3 "$src/scripts/ensure_cookie_support.py" "$SKILLS_DIR/watch/scripts/download.py" || true
 
@@ -31,5 +31,5 @@ if [ -f "$CFG" ]; then
   ver="$(cat "$src/VERSION" 2>/dev/null || echo 0.0.0)"
   sed -i.bak "s#^version = .*#version = \"$ver\"#" "$CFG" && rm -f "$CFG.bak"
 fi
-python3 "$SKILLS_DIR/watch-vault/scripts/report_to_html.py" --demo >/dev/null && ok "self-check passed"
-ok "watch-vault updated."
+python3 "$SKILLS_DIR/yt-video-review-eval/scripts/report_to_html.py" --demo >/dev/null && ok "self-check passed"
+ok "yt-video-review-eval updated."

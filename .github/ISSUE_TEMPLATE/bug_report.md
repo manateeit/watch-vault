@@ -15,7 +15,7 @@ labels: bug
 
 **Environment**
 - OS: macOS / Linux / WSL
-- watch-vault version (`cat VERSION` or config `version`):
+- yt-video-review-eval version (`cat VERSION` or config `version`):
 - Claude Code version:
 
 **Logs / output**
