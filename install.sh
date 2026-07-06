@@ -70,7 +70,7 @@ ok "watch-vault skill installed → $SKILLS_DIR/watch-vault"
 # ── 4. Vault ──────────────────────────────────────────────────────────────────────────────
 say "Locating your Obsidian vault…"
 vault=""
-for c in "$WATCH_VAULT_DIR" "$HOME/Second brain" "$HOME/Documents/Obsidian" "$HOME/Obsidian"; do
+for c in "${WATCH_VAULT_DIR:-}" "$HOME/Second brain" "$HOME/Documents/Obsidian" "$HOME/Obsidian"; do
   [ -n "$c" ] && [ -d "$c" ] && { vault="$c"; break; }
 done
 if [ -n "$vault" ]; then

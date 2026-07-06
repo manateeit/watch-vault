@@ -6,6 +6,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 ## [Unreleased]
 - _Add new entries here as you develop; move them under a version on release._
 
+## [0.2.3] — 2026-07-06
+### Fixed
+- **Installer crashed at vault detection when `WATCH_VAULT_DIR` was unset** (`set -u` unbound
+  variable) — anyone without that env var (i.e. most fresh installs) hit it. Now defaults to empty.
+  Found by testing on a fresh Mac.
+
 ## [0.2.2] — 2026-07-06
 ### Fixed
 - **no-brew installer used the wrong verify flag for yt-dlp** — checked `yt-dlp -version`
@@ -44,7 +50,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 - **Update channel**: `update.sh` + `check_updates.py` (GitHub tags).
 - Cross-platform review opener (macOS/Linux/WSL).
 
-[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/manateeit/watch-vault/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/manateeit/watch-vault/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/manateeit/watch-vault/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/manateeit/watch-vault/compare/v0.1.0...v0.2.0
