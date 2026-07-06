@@ -96,12 +96,18 @@ only when the analyst flags `confidence: low` or the video is `>30 min AND dense
 
 ## Updating
 
+**From inside Claude Code (easiest):** just say **`watch-vault update`** (or "check for a watch-vault
+update"). The skill runs a self-contained updater that re-clones/pulls and reinstalls itself — even if
+you deleted the original clone — then tells you to restart Claude Code.
+
+**From a terminal:**
 ```bash
-python3 skills/watch-vault/scripts/check_updates.py   # or: make check-updates
-./update.sh                                            # or: make update
+python3 ~/.claude/skills/watch-vault/scripts/check_updates.py   # is a new version out?
+python3 ~/.claude/skills/watch-vault/scripts/self_update.py     # update in place
+# or, from a checkout:  ./update.sh   ·   make update
 ```
-`check_updates.py` compares your installed `VERSION` to the latest GitHub tag; `update.sh` pulls and
-re-installs the skill in place.
+`check_updates.py` compares your installed version to the latest GitHub tag; `self_update.py` /
+`update.sh` pull and re-install the skill.
 
 ## Uninstall
 

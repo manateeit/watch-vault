@@ -6,6 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 ## [Unreleased]
 - _Add new entries here as you develop; move them under a version on release._
 
+## [0.2.0] — 2026-07-06
+### Added
+- **`watch-vault update` subcommand** — update from inside Claude Code (no terminal needed).
+  Backed by a self-contained `self_update.py` that re-clones/pulls and reinstalls the skill in
+  place, even if the original checkout was deleted.
+- **`watch-vault check-updates` / `watch-vault version` subcommands.**
+- SKILL.md now routes maintenance subcommands before the watch pipeline.
+
 ## [0.1.0] — 2026-07-06
 ### Added
 - **One-command pipeline** (`watch-vault <url>`): watch → auto-categorize → ingest → review HTML → open.
@@ -22,5 +30,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 - **Update channel**: `update.sh` + `check_updates.py` (GitHub tags).
 - Cross-platform review opener (macOS/Linux/WSL).
 
-[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/manateeit/watch-vault/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/manateeit/watch-vault/releases/tag/v0.1.0
