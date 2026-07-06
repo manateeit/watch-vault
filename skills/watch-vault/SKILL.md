@@ -41,6 +41,14 @@ If the user's message is a maintenance command rather than a URL, do that instea
 
 Anything that contains a video URL falls through to the pipeline below.
 
+## Batch Mode (NEW — v0.3.0)
+
+For ingesting **multiple videos in one run**, use the **Workflow version:**
+```
+/workflows watch-vault-full [url1, url2, url3, ...]
+```
+Orchestrates download → analyze → research → ingest → HTML in parallel phases. Same pipeline, fully orchestrated so all videos run in parallel where possible. Shows in `/workflows` dashboard while running. Pass URLs as an array in the skill args (or one at a time for single URL via the standard `watch-vault <url>` skill).
+
 ## Model & sub-agent routing (cost discipline — follow this)
 
 | Stage | Runs as | Model | Why |
