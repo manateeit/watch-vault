@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 ## [Unreleased]
 - _Add new entries here as you develop; move them under a version on release._
 
+## [0.2.1] — 2026-07-06
+### Fixed
+- **macOS without Homebrew** — the installer no longer dies at the dependency step. On a brew-less
+  Mac it installs `ffmpeg`/`ffprobe` (evermeet.cx static builds) and `yt-dlp` as **no-sudo binaries**
+  in `~/.local/bin`, adds that dir to PATH, and **verifies each binary runs** (with a clear
+  Rosetta-2 hint on Apple Silicon if it can't). Found by testing on a fresh Mac.
+
 ## [0.2.0] — 2026-07-06
 ### Added
 - **`watch-vault update` subcommand** — update from inside Claude Code (no terminal needed).
@@ -30,6 +37,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow 
 - **Update channel**: `update.sh` + `check_updates.py` (GitHub tags).
 - Cross-platform review opener (macOS/Linux/WSL).
 
-[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/manateeit/watch-vault/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/manateeit/watch-vault/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/manateeit/watch-vault/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/manateeit/watch-vault/releases/tag/v0.1.0
