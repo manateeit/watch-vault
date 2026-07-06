@@ -72,7 +72,9 @@ fetch_static_bin() {
   esac
   rc=$?; rm -rf "$tmp"
   [ $rc -eq 0 ] && [ -x "$dst" ] || { warn "Could not download $name."; return 1; }
-  if ! "$dst" -version >/dev/null 2>&1; then
+  # verify it actually runs — yt-dlp uses --version, ffmpeg/ffprobe use -version
+  local vflag="-version"; [ "$name" = "yt-dlp" ] && vflag="--version"
+  if ! "$dst" "$vflag" >/dev/null 2>&1; then
     warn "$name downloaded but won't run here (Apple Silicon likely needs Rosetta 2)."
     warn "Fix with:  softwareupdate --install-rosetta --agree-to-license   — or install Homebrew (https://brew.sh)."
     return 1
