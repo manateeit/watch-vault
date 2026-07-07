@@ -41,4 +41,5 @@ version = ""                       # installed version
 [thalix]
 enabled = false          # opt-in only
 scope = "dev"            # ingest scope when enabled (v1 = local/dev)
-timeout_seconds = 10     # hard cap so a hung CLI can't block the vault flow
+timeout_seconds = 30     # hard cap so a hung run can't block the vault flow
+repo_dir = ""            # Thalix repo root (runs `python3 -m ingest` from here); blank -> ~/development/thalix
