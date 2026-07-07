@@ -41,13 +41,26 @@ If the user's message is a maintenance command rather than a URL, do that instea
 
 Anything that contains a video URL falls through to the pipeline below.
 
-## Batch Mode (NEW — v0.3.0)
+## Batch Mode (NEW — v0.3.1)
 
-For ingesting **multiple videos in one run**, use the **Workflow version:**
+For ingesting **multiple videos in one run**, use the **Workflow:**
 ```
-/workflows yt-video-review-eval-full [url1, url2, url3, ...]
+/yt-video-review-eval ["https://youtu.be/...", "https://youtu.be/...", ...]
 ```
-Orchestrates download → analyze → research → ingest → HTML in parallel phases. Same pipeline, fully orchestrated so all videos run in parallel where possible. Shows in `/workflows` dashboard while running. Pass URLs as an array in the skill args (or one at a time for single URL via the standard `yt-video-review-eval <url>` skill).
+
+The Workflow (saved at `~/.claude/workflows/yt-video-review-eval.js`) orchestrates the entire pipeline in parallel:
+- **Phase 1 (Download):** All videos download in parallel via `watch.py`
+- **Phase 2 (Analyze):** Sonnet analysts fill reports for each video in parallel
+- **Phase 3 (Research):** Sonnet researchers add Resources & Reality-check for each in parallel
+- **Phase 4 (Ingest):** Move reports/frames to vault, append to log.md, create topic notes
+- **Phase 5 (Publish):** Generate HTML reviews for each video
+
+**Key differences from single-URL skill:**
+- Single URL: `yt-video-review-eval https://youtu.be/...` (runs via procedural SKILL.md steps)
+- Multiple URLs: `/yt-video-review-eval ["url1", "url2", ...]` (runs as Workflow with `/workflows` progress view)
+- Workflow shows real-time progress, agent counts, token totals, elapsed time
+- Use `/workflows` to monitor, pause, resume, or drill into individual phases/agents
+- All parallelizable steps (download, analyze, research, HTML generation) run concurrently
 
 ## Model & sub-agent routing (cost discipline — follow this)
 
@@ -70,9 +83,10 @@ Never read frames in the main thread; never use Opus for a step Sonnet or a scri
 Read `~/.config/yt-video-review-eval/config.toml` (created by the installer). Honor:
 `vault_dir`, `open_command` (macOS `open` · Linux `xdg-open` · WSL `explorer.exe`),
 `cookies_from_browser`, `whisper_backend`, `routing_posture`, `max_frames`,
-`reality_check`, `resource_finder`, `auto_open_review`. Env vars override the file.
-If the file is missing, fall back to sane defaults (auto-detect vault, `open`, no cookies,
-Balanced posture, cap 15, reality-check on).
+`reality_check`, `resource_finder`, `auto_open_review`, and the optional `[thalix]` block
+(`enabled` default false). Env vars override the file. If the file is missing, fall back to
+sane defaults (auto-detect vault, `open`, no cookies, Balanced posture, cap 15,
+reality-check on, thalix off).
 
 ## Step 1 — Preflight (skip if already green this session)
 `python3 <setup.py> --check` → on non-zero follow the /watch setup table. **Bot-gate
@@ -158,6 +172,15 @@ Writes `<CAT>/watched/<slug>/review.html` (self-contained, hero frames embedded,
 transcript collapsed). Add `> 🖥️ [Review page](watched/<slug>/review.html)` near the top
 of the topic note, then open the HTML with the configured `open_command`
 (`open` / `xdg-open` / `explorer.exe`) if `auto_open_review` is on.
+
+## Step 6.5 — Optional Thalix hand-off (default OFF, fail-soft)
+After `report.md` is final in the vault, run the guarded hand-off script. It is a **silent
+no-op** unless `[thalix].enabled = true` in config AND the `thalix` binary is on PATH, and it
+**never** breaks the vault flow (disabled / absent / CLI error / hang all → exit 0):
+```
+python3 ~/.claude/skills/yt-video-review-eval/scripts/thalix_handoff.py "<CAT>/watched/<slug>/report.md"
+```
+Do not mention Thalix to the user when it is disabled. Self-check: `thalix_handoff.py --selftest`.
 
 ## Step 7 — Report back + clean up
 Tell the user: category chosen, topic-note path, `watched/<slug>/` report + review.html

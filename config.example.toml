@@ -32,3 +32,13 @@ resource_finder = true             # research how to get software/links a video 
 repo = "manateeit/yt-video-review-eval"
 source_dir = ""                    # where the installer cloned the repo
 version = ""                       # installed version
+
+# --- Thalix hand-off (OPTIONAL, default OFF) -----------------------------------------------
+# Opt-in bridge that hands each finished report.md to a local `thalix` CLI for knowledge
+# ingestion. Fires ONLY when enabled = true AND the `thalix` binary is on PATH; otherwise a
+# silent no-op that never touches the vault flow. Leave off unless you have Thalix.
+# Override with WATCH_VAULT_THALIX_ENABLED=1 (force on) / =0 (force off).
+[thalix]
+enabled = false          # opt-in only
+scope = "dev"            # ingest scope when enabled (v1 = local/dev)
+timeout_seconds = 10     # hard cap so a hung CLI can't block the vault flow
