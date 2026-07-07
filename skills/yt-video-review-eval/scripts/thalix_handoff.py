@@ -1,18 +1,25 @@
 #!/usr/bin/env python3
 """Optional, default-OFF hand-off of a finished report.md to the Thalix substrate.
 
-The real ingest entry point is the FR-009 verb run from the Thalix repo root:
+Two destinations:
 
-    python3 -m ingest "<report.md>" --kind video_review --scope <scope>
+* **v1 — local dev (IMPLEMENTED).** When no remote instance is configured, run the
+  FR-009 ingest verb from the local Thalix repo:
+      python3 -m ingest "<report.md>" --kind video_review --scope <scope>
+  (NOT `thalix ingest` — that subcommand does not exist; `thalix` is read-only.)
 
-(NOT `thalix ingest` — that CLI subcommand does not exist; the `thalix` binary is
-read-only: search/get/atoms/propose/...). This script fires ONLY when BOTH are true:
-  1. [thalix].enabled = true in ~/.config/yt-video-review-eval/config.toml
-     (or WATCH_VAULT_THALIX_ENABLED=1 in the env), AND
-  2. the Thalix repo (with its `ingest` module) exists at [thalix].repo_dir.
-Otherwise it is a silent no-op. Every failure axis — disabled, repo absent, ingest
-error, or a hung run (Python-native timeout) — is swallowed to at most one stderr
-line and exits 0, so the vault flow is never broken.
+* **v1.5 — per-customer remote instance (PLANNED, not wired).** Thalix is deployed
+  privately per customer, so a real deployment points at *that customer's* substrate
+  (``[thalix].instance`` / ``endpoint`` / ``profile``) and authenticates with a
+  per-customer key referenced by env-var name (``[thalix].api_key_env`` — the raw key
+  never lives in this file). Until that path ships, if ANY remote field is set this
+  script SKIPS (``remote-unimplemented``) rather than silently writing to the local dev
+  db — so customer data is never misrouted.
+
+Fires only when ``[thalix].enabled = true`` (or WATCH_VAULT_THALIX_ENABLED=1). Every
+failure axis — disabled, repo absent, ingest error, hung run (Python-native timeout),
+or an unwired remote target — is swallowed to at most one stderr line and exits 0, so
+the vault flow is never broken.
 
 stdlib only. Usage:  python3 thalix_handoff.py "<CAT>/watched/<slug>/report.md"
 Self-check:          python3 thalix_handoff.py --selftest
@@ -45,7 +52,10 @@ def _read_thalix_section(text):
 
 def load_config():
     cfg = {"enabled": False, "scope": "dev", "timeout_seconds": 30,
-           "repo_dir": DEFAULT_REPO_DIR}
+           "repo_dir": DEFAULT_REPO_DIR,
+           # v1.5 per-customer remote (PLANNED) — default empty => local path
+           "instance": "", "endpoint": "", "profile": "",
+           "api_key_env": "THALIX_API_KEY"}
     if CONFIG.exists():
         raw = _read_thalix_section(CONFIG.read_text())
         if "enabled" in raw:
@@ -56,16 +66,27 @@ def load_config():
             cfg["timeout_seconds"] = int(raw["timeout_seconds"])
         if raw.get("repo_dir"):
             cfg["repo_dir"] = str(Path(raw["repo_dir"]).expanduser())
+        for k in ("instance", "endpoint", "profile", "api_key_env"):
+            if raw.get(k):
+                cfg[k] = raw[k]
     env = os.environ.get("WATCH_VAULT_THALIX_ENABLED")
     if env is not None:
         cfg["enabled"] = env.strip() in ("1", "true", "True")
     return cfg
 
 
+def _remote_configured(cfg):
+    return bool(cfg.get("instance") or cfg.get("endpoint") or cfg.get("profile"))
+
+
 def handoff(report_path, cfg):
     """Returns a short status string; never raises."""
     if not cfg["enabled"]:
         return "disabled"
+    # A per-customer remote instance is configured but the remote/auth path is not
+    # wired yet — SKIP rather than misroute customer data into the local dev db.
+    if _remote_configured(cfg):
+        return "remote-unimplemented"
     repo = Path(cfg["repo_dir"])
     if not (repo / "ingest" / "__main__.py").is_file():
         return "no-ingest"          # Thalix repo/ingest module not present here
@@ -88,17 +109,21 @@ def handoff(report_path, cfg):
 
 def _selftest():
     sample = ('[other]\nx = 1\n[thalix]\nenabled = true  # inline comment\n'
-              'scope = "aws"\ntimeout_seconds = 5\nrepo_dir = "/tmp/nope"\n')
+              'scope = "aws"\ntimeout_seconds = 5\nrepo_dir = "/tmp/nope"\n'
+              'endpoint = "https://acme.example"\napi_key_env = "ACME_KEY"\n')
     got = _read_thalix_section(sample)
     assert got["enabled"] == "true", got
-    assert got["scope"] == "aws", got
-    assert got["repo_dir"] == "/tmp/nope", got
-    # disabled -> no-op regardless of repo
-    assert handoff("/nonexistent", {"enabled": False, "scope": "dev",
-                                    "timeout_seconds": 1, "repo_dir": "/tmp"}) == "disabled"
-    # enabled but no ingest module at repo_dir -> fail-soft, NOT treated as ingested
-    assert handoff("/nonexistent", {"enabled": True, "scope": "dev",
-                                    "timeout_seconds": 1, "repo_dir": "/tmp/definitely-not-thalix"}) == "no-ingest"
+    assert got["endpoint"] == "https://acme.example", got
+    assert got["api_key_env"] == "ACME_KEY", got
+    base = {"enabled": True, "scope": "dev", "timeout_seconds": 1,
+            "repo_dir": "/tmp/definitely-not-thalix",
+            "instance": "", "endpoint": "", "profile": "", "api_key_env": "THALIX_API_KEY"}
+    # disabled -> no-op
+    assert handoff("/nonexistent", {**base, "enabled": False}) == "disabled"
+    # remote configured but unwired -> skip, do NOT fall back to local
+    assert handoff("/nonexistent", {**base, "endpoint": "https://acme.example"}) == "remote-unimplemented"
+    # enabled, local, but no ingest module -> fail-soft
+    assert handoff("/nonexistent", base) == "no-ingest"
     print("selftest ok")
 
 

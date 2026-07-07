@@ -42,4 +42,28 @@ version = ""                       # installed version
 enabled = false          # opt-in only
 scope = "dev"            # ingest scope when enabled (v1 = local/dev)
 timeout_seconds = 30     # hard cap so a hung run can't block the vault flow
-repo_dir = ""            # Thalix repo root (runs `python3 -m ingest` from here); blank -> ~/development/thalix
+
+# v1 — local dev (IMPLEMENTED): ingest runs as `python3 -m ingest` from the local Thalix repo.
+repo_dir = ""            # local Thalix repo root; blank -> ~/development/thalix
+
+# v1.5 — per-customer remote instance (PLANNED, NOT wired yet). Thalix is deployed privately
+# per customer; a real deployment targets *that customer's* substrate. Setting ANY field below
+# makes the hand-off SKIP for now (never silently writes local) until remote propose + auth ships.
+# Keys stay OUT of this file — see api_key_env.
+instance = ""            # customer instance id (e.g. "acme") — selects the target substrate
+endpoint = ""            # https base URL of that instance's substrate API (POST /api/propose)
+profile = ""             # named profile in ~/.thalix/config.toml bundling URL + auth
+api_key_env = "THALIX_API_KEY"   # NAME of the env var holding the access key — never the key itself
+
+# --- Second voice: independent fact-check cross-check (OPTIONAL, default OFF) ---------------
+# Cross-checks the 1-10 reality-check with an INDEPENDENT retriever (Perplexity). The value is
+# DIVERGENCE: claims both engines score alike are high-confidence; claims they split on get
+# flagged ⚠️ CONTESTED. Fires only on hype-heavy / low-confidence videos so the spend lands
+# where the BS is. Requires PERPLEXITY_API_KEY + the official Perplexity MCP server
+# (github.com/perplexityai/modelcontextprotocol via `claude mcp add`); no-op if not connected.
+# Override with WATCH_VAULT_SECOND_VOICE_ENABLED=1 (force on) / =0 (force off).
+[second_voice]
+enabled = false                     # opt-in only
+model = "sonar-pro"                 # default lane (~$3/$15 per M tokens)
+deep_model = "sonar-deep-research"  # escalation lane (dense / >30 min / confidence low)
+trigger_hype = 5                    # run only when first-pass overall hype >= this (1-10), OR confidence: low
